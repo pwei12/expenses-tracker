@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 import { formRules } from '@/utils/formRules';
 import { SIGNUP_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
 import { hashPassword } from '@/utils/auth';
+import CenterWrapper from '../components/CenterWrapper';
+import RoundCornerButton from '../components/RoundCornerButton';
 
 const httpHeaders = {
   'Content-Type': 'application/json'
@@ -48,7 +50,7 @@ const SignupPage = () => {
         setSubmitting(false);
       }
     },
-    [form, router]
+    [router]
   );
 
   return (
@@ -63,11 +65,9 @@ const SignupPage = () => {
         gutter={[16, 16]}
       >
         <Col xs={24} sm={16} md={12} lg={8} xl={7}>
-          <Row justify="center" align="middle">
-            <Col>
-              <Typography.Title level={3}>Signup an account</Typography.Title>
-            </Col>
-          </Row>
+          <CenterWrapper>
+            <Typography.Title level={3}>Signup an account</Typography.Title>
+          </CenterWrapper>
           <Form
             form={form}
             onFinish={handleSignup}
@@ -83,7 +83,7 @@ const SignupPage = () => {
             </Form.Item>
             <Form.Item
               name="email"
-              label="Email Address"
+              label="Email"
               rules={[formRules.EMAIL_REQUIRED, formRules.EMAIL_FORMAT]}
             >
               <Input autoComplete={'email'} />
@@ -104,18 +104,15 @@ const SignupPage = () => {
             >
               <Input.Password />
             </Form.Item>
-            <Row justify="center" align="middle">
-              <Col>
-                <Button
-                  loading={submitting}
-                  type="primary"
-                  htmlType="submit"
-                  style={{ borderRadius: '5px' }}
-                >
-                  Sign up
-                </Button>
-              </Col>
-            </Row>
+            <CenterWrapper>
+              <RoundCornerButton
+                loading={submitting}
+                type="primary"
+                htmlType="submit"
+              >
+                Submit
+              </RoundCornerButton>
+            </CenterWrapper>
           </Form>
         </Col>
       </Row>
