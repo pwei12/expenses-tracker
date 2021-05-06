@@ -1,27 +1,16 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  message,
-  Row,
-  Typography
-} from 'antd';
+import { Button, Col, Form, Input, message, Row, Typography } from 'antd';
 import Head from 'next/head';
 import { useCallback, useState } from 'react';
-import sha from 'sha.js';
 import { useRouter } from 'next/router';
-import { formRules } from '../src/utils/formRules';
+import { formRules } from '@/utils/formRules';
+import { SIGNUP_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
+import { hashPassword } from '@/utils/auth';
 
 const httpHeaders = {
   'Content-Type': 'application/json'
 };
-const SIGNUP_ROUTE = '/api/users/signup';
-const EXPENSES_ROUTE = '/expenses';
-const HASH_ALGO = 'sha256';
-const HASH_DIGEST = 'hex';
 const HTTP_POST_METHOD = 'POST';
-const SUCCESSFUL_SIGNUP_MESSAGE = 'Successfully created account';
+const SUCCESSFUL_SIGNUP_MESSAGE = 'Signup completed';
 const SIGNUP_ERROR_MESSAGE = 'Unexpected error. Please try again';
 
 const SignupPage = () => {
@@ -35,10 +24,7 @@ const SignupPage = () => {
       try {
         setSubmitting(true);
 
-        const hashedPassword = sha(HASH_ALGO)
-          .update(password)
-          .digest(HASH_DIGEST);
-
+        const hashedPassword = hashPassword(password);
         const response = await fetch(SIGNUP_ROUTE, {
           method: HTTP_POST_METHOD,
           headers: httpHeaders,
@@ -50,11 +36,12 @@ const SignupPage = () => {
           })
         });
 
-       if(response.ok) message.success(SUCCESSFUL_SIGNUP_MESSAGE);
-
-        router.push({
-          pathname: EXPENSES_ROUTE,
-        });
+        if (response.ok) {
+          message.success(SUCCESSFUL_SIGNUP_MESSAGE);
+          router.push({
+            pathname: EXPENSES_ROUTE
+          });
+        }
       } catch (error) {
         message.error(SIGNUP_ERROR_MESSAGE);
       } finally {
@@ -65,7 +52,7 @@ const SignupPage = () => {
   );
 
   return (
-    <div>
+    <>
       <Head>
         <title>Sign Up</title>
       </Head>
@@ -85,7 +72,7 @@ const SignupPage = () => {
             form={form}
             onFinish={handleSignup}
             style={{ marginTop: 20 }}
-            layout='vertical'
+            layout="vertical"
           >
             <Form.Item
               name="userName"
@@ -97,10 +84,7 @@ const SignupPage = () => {
             <Form.Item
               name="email"
               label="Email Address"
-              rules={[
-                formRules.EMAIL_REQUIRED,
-                formRules.EMAIL_FORMAT
-              ]}
+              rules={[formRules.EMAIL_REQUIRED, formRules.EMAIL_FORMAT]}
             >
               <Input autoComplete={'email'} />
             </Form.Item>
@@ -114,8 +98,8 @@ const SignupPage = () => {
             </Form.Item>
             <Form.Item
               hasFeedback
-              name='confirmedPassword'
-              label='Confirm Password'
+              name="confirmedPassword"
+              label="Confirm Password"
               rules={[formRules.PASSWORD_REQUIRED, formRules.PASSWORD_MATCH]}
             >
               <Input.Password />
@@ -135,7 +119,7 @@ const SignupPage = () => {
           </Form>
         </Col>
       </Row>
-    </div>
+    </>
   );
 };
 
