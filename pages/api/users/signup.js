@@ -5,13 +5,17 @@ const handler = createHanlder();
 
 handler.post(async (req, res) => {
   const { userName, email, password, confirmedPassword } = req.body;
-  const incompleteData = !(userName && email, password, confirmedPassword);
+  const incompleteData = !(userName && email && password && confirmedPassword);
   if (incompleteData) {
-    return res.status(400).json('Incomplete field.');
+    return res
+      .status(400)
+      .json({ success: false, reason: 'Incomplete field.' });
   }
 
   if (password !== confirmedPassword) {
-    return res.status(400).json('Passwords are not identical.');
+    return res
+      .status(400)
+      .json({ success: false, reason: 'Passwords are not identical.' });
   }
 
   const userFound = await User.findOne({ email }).exec();

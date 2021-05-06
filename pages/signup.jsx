@@ -1,0 +1,142 @@
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Row,
+  Typography
+} from 'antd';
+import Head from 'next/head';
+import { useCallback, useState } from 'react';
+import sha from 'sha.js';
+import { useRouter } from 'next/router';
+import { formRules } from '../src/utils/formRules';
+
+const httpHeaders = {
+  'Content-Type': 'application/json'
+};
+const SIGNUP_ROUTE = '/api/users/signup';
+const EXPENSES_ROUTE = '/expenses';
+const HASH_ALGO = 'sha256';
+const HASH_DIGEST = 'hex';
+const HTTP_POST_METHOD = 'POST';
+const SUCCESSFUL_SIGNUP_MESSAGE = 'Successfully created account';
+const SIGNUP_ERROR_MESSAGE = 'Unexpected error. Please try again';
+
+const SignupPage = () => {
+  const router = useRouter();
+  const [form] = Form.useForm();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSignup = useCallback(
+    async formValue => {
+      const { userName, email, password } = formValue;
+      try {
+        setSubmitting(true);
+
+        const hashedPassword = sha(HASH_ALGO)
+          .update(password)
+          .digest(HASH_DIGEST);
+
+        const response = await fetch(SIGNUP_ROUTE, {
+          method: HTTP_POST_METHOD,
+          headers: httpHeaders,
+          body: JSON.stringify({
+            userName,
+            email,
+            password: hashedPassword,
+            confirmedPassword: hashedPassword
+          })
+        });
+
+       if(response.ok) message.success(SUCCESSFUL_SIGNUP_MESSAGE);
+
+        router.push({
+          pathname: EXPENSES_ROUTE,
+        });
+      } catch (error) {
+        message.error(SIGNUP_ERROR_MESSAGE);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [form, router]
+  );
+
+  return (
+    <div>
+      <Head>
+        <title>Sign Up</title>
+      </Head>
+      <Row
+        justify="center"
+        align="middle"
+        style={{ padding: 24 }}
+        gutter={[16, 16]}
+      >
+        <Col xs={24} sm={16} md={12} lg={8} xl={7}>
+          <Row justify="center" align="middle">
+            <Col>
+              <Typography.Title level={3}>Signup an account</Typography.Title>
+            </Col>
+          </Row>
+          <Form
+            form={form}
+            onFinish={handleSignup}
+            style={{ marginTop: 20 }}
+            layout='vertical'
+          >
+            <Form.Item
+              name="userName"
+              label="Username"
+              rules={[formRules.USERNAME_REQUIRED, formRules.USERNAME_FORMAT]}
+            >
+              <Input autoComplete="username" />
+            </Form.Item>
+            <Form.Item
+              name="email"
+              label="Email Address"
+              rules={[
+                formRules.EMAIL_REQUIRED,
+                formRules.EMAIL_FORMAT
+              ]}
+            >
+              <Input autoComplete={'email'} />
+            </Form.Item>
+            <Form.Item
+              hasFeedback
+              name="password"
+              label="Password"
+              rules={[formRules.PASSWORD_REQUIRED, formRules.PASSWORD_FORMAT]}
+            >
+              <Input.Password />
+            </Form.Item>
+            <Form.Item
+              hasFeedback
+              name='confirmedPassword'
+              label='Confirm Password'
+              rules={[formRules.PASSWORD_REQUIRED, formRules.PASSWORD_MATCH]}
+            >
+              <Input.Password />
+            </Form.Item>
+            <Row justify="center" align="middle">
+              <Col>
+                <Button
+                  loading={submitting}
+                  type="primary"
+                  htmlType="submit"
+                  style={{ borderRadius: '5px' }}
+                >
+                  Sign up
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default SignupPage;
