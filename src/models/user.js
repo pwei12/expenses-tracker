@@ -1,15 +1,11 @@
 import mongoose from 'mongoose';
+import mongooseBcrypt from 'mongoose-bcrypt';
 
 const MODEL_NAME = 'User';
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      trim: true,
-      required: true
-    },
-    lastName: {
+    userName: {
       type: String,
       trim: true,
       required: true
@@ -28,6 +24,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.plugin(mongooseBcrypt);
 
 export default mongoose.models[MODEL_NAME] ||
   mongoose.model(MODEL_NAME, userSchema);
