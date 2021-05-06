@@ -3,11 +3,14 @@ import mongoose from 'mongoose';
 export const dbConnect = async () => {
   if (mongoose.connection.readyState >= 1) return;
 
-  const dbConnection = mongoose.connect(process.env.MONGO_DB_URI, {
+  const dbConnection = await mongoose.connect(process.env.MONGO_DB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useFindAndModify: false
   });
-  mongoose.set('useCreateIndex', true);
+
   return dbConnection;
 };
 
