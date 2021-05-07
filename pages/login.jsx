@@ -64,7 +64,7 @@ const LoginPage = () => {
         <Row
           justify="center"
           align="middle"
-          style={{ padding: 24, height: '100%', width: '100%' }}
+          style={{ height: '100%', width: '100%' }}
         >
           <Col xs={24} sm={16} md={12} lg={8} xl={7}>
             <CenterWrapper>
@@ -103,16 +103,10 @@ const LoginPage = () => {
               </CenterWrapper>
             </Form>
 
-            <div
-              style={{
-                marginTop: '16px',
-                display: 'flex',
-                justifyContent: 'center'
-              }}
-            >
-              <Link href="/signup">Create an account </Link>
-              <span>&nbsp; if don't have one yet</span>
-            </div>
+            <CenterWrapper style={{ marginTop: '16px' }}>
+              <Link href="/signup">Create an account</Link>
+              <span>&nbsp;if don't have one yet</span>
+            </CenterWrapper>
           </Col>
         </Row>
       </MainLayout>

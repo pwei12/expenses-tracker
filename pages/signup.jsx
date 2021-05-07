@@ -68,7 +68,6 @@ const SignupPage = () => {
           justify="center"
           align="middle"
           style={{
-            padding: 24,
             height: '100%',
             width: '100%'
           }}
@@ -124,16 +123,10 @@ const SignupPage = () => {
               </CenterWrapper>
             </Form>
 
-            <div
-              style={{
-                marginTop: '16px',
-                display: 'flex',
-                justifyContent: 'center'
-              }}
-            >
+            <CenterWrapper style={{ marginTop: '16px' }}>
               <Link href="/login">Log in here</Link>
-              <span>&nbsp; if already have an account</span>
-            </div>
+              <span>&nbsp;if already have an account</span>
+            </CenterWrapper>
           </Col>
         </Row>
       </MainLayout>
