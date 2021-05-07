@@ -5,8 +5,8 @@ import { useRouter } from 'next/router';
 import { destroyCookie } from 'nookies';
 import { formRules } from '@/utils/formRules';
 import { hashPassword } from '@/utils/auth';
-import { apiCall } from '@/utils/apiCall';
-import { SIGNUP_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
+import { postRequest } from '@/utils/apiCall';
+import { SIGNUP_API_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
 import MainLayout from '../components/MainLayout';
@@ -38,8 +38,8 @@ const SignupPage = () => {
         confirmedPassword: hashedPassword
       };
 
-      const response = await apiCall(
-        SIGNUP_ROUTE,
+      const response = await postRequest(
+        SIGNUP_API_ROUTE,
         payload,
         () => setSubmitting(false),
         () => message.error(SIGNUP_ERROR_MESSAGE)
