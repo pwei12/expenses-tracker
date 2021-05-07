@@ -65,7 +65,7 @@ const SignupPage = () => {
       <Row
         justify="center"
         align="middle"
-        style={{ padding: 24 }}
+        style={{ padding: 24, height: '100vh' }}
         gutter={[16, 16]}
       >
         <Col xs={24} sm={16} md={12} lg={8} xl={7}>
