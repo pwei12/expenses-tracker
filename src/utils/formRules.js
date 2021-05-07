@@ -1,3 +1,6 @@
+const MINIMUM_PASSWORD_LENGTH = 6;
+const MAXIMUM_PASSWORD_LENGTH = 10;
+
 export const formRules = {
   FIELD_REQUIRED: {
     required: true,
@@ -17,15 +20,16 @@ export const formRules = {
   },
   USERNAME_FORMAT: () => ({
     validator(_rule, value) {
-      if (value && value.includes(' ')) 
+      if (value && value.includes(' '))
         return Promise.reject('Username cannot contain space');
       return Promise.resolve();
     }
   }),
   PASSWORD_FORMAT: {
-    pattern: /^(?=\S*[a-zA-Z])(?=\S*\d)(?=\S*([^\w\s]|[_]))\S{6,10}$/,
-    message:
-      'Password should consist of at least one letter, one number, one special charactoer and be at least 6 to 10 characters long.'
+    pattern: new RegExp(
+      `^(?=\\S*[a-zA-Z])(?=\\S*\\d)(?=\\S*([^\\w\\s]|[_]))\\S{${MINIMUM_PASSWORD_LENGTH},${MAXIMUM_PASSWORD_LENGTH}}$`
+    ),
+    message: `Password should consist of at least one letter, one number, one special charactoer and be at least ${MINIMUM_PASSWORD_LENGTH} to ${MAXIMUM_PASSWORD_LENGTH} characters long.`
   },
   PASSWORD_REQUIRED: {
     required: true,
@@ -38,5 +42,10 @@ export const formRules = {
       }
       return Promise.reject('Please enter identical password');
     }
-  })
+  }),
+  LOGIN_PASSWORD_FORMAT: {
+    required: true,
+    min: MINIMUM_PASSWORD_LENGTH,
+    message: `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters`
+  }
 };
