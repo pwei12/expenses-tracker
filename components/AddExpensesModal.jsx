@@ -2,18 +2,7 @@ import { DatePicker, Form, Input, Modal, Select } from 'antd';
 import moment from 'moment-timezone';
 import RoundCornerButton from './RoundCornerButton';
 import { formRules } from '@/utils/formRules';
-
-const CATEGORIES = [
-  'Other',
-  'Food & Drinks',
-  'Clothes',
-  'Transport',
-  'Entertainment',
-  'Accommodation',
-  'Donation',
-  'Travel',
-  'Insurance'
-];
+import { EXPENSE_CATEGORIES } from '@/constants/expense';
 
 const AddExpensesModal = props => {
   const {
@@ -32,7 +21,7 @@ const AddExpensesModal = props => {
       <Form
         form={form}
         onFinish={onAddExpenses}
-        initialValues={{ category: CATEGORIES[0], date: today }}
+        initialValues={{ category: EXPENSE_CATEGORIES[0], date: today }}
         layout="vertical"
       >
         <Form.Item
@@ -46,7 +35,7 @@ const AddExpensesModal = props => {
           <Select
             onChange={categorySelected => onSelectCategory(categorySelected)}
           >
-            {CATEGORIES.map(category => (
+            {EXPENSE_CATEGORIES.map(category => (
               <Select.Option key={category} value={category}>
                 {category}
               </Select.Option>
@@ -55,6 +44,9 @@ const AddExpensesModal = props => {
         </Form.Item>
         <Form.Item name="date" label="Date">
           <DatePicker onChange={onSelectDate} />
+        </Form.Item>
+        <Form.Item name="notes" label="Notes">
+          <Input.TextArea showCount maxLength={30} />
         </Form.Item>
         <RoundCornerButton loading={loading} type="primary" htmlType="submit">
           Ok
