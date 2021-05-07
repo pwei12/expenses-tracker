@@ -1,25 +1,6 @@
 import { Grid, Layout, Typography } from 'antd';
-import styled from 'styled-components';
 import Link from 'next/link';
-
-const Icon = styled.div`
-  position: relative;
-  background-color: greenyellow;
-  height: 16px;
-  width: 14px;
-  color: white;
-  border-radius: 0 50%;
-  :after {
-    content: '';
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    background-color: gold;
-    border-radius: 0 50%;
-    left: 7px;
-    transform: rotate(90deg);
-  }
-`;
+import AppIcon from './AppIcon';
 
 const Header = () => {
   const breakpoint = Grid.useBreakpoint();
@@ -36,7 +17,7 @@ const Header = () => {
       }}
     >
       <Link href="/">
-        <Icon />
+        <AppIcon />
       </Link>
       {isMobile ? null : (
         <Typography.Title
