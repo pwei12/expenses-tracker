@@ -1,39 +1,8 @@
-import { Button, Grid, Layout, Typography } from 'antd';
+import { Layout } from 'antd';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-
-const { useBreakpoint } = Grid;
-
-import styled from 'styled-components';
-
-const Icon = styled.div`
-  position: relative;
-  background-color: greenyellow;
-  height: 16px;
-  width: 14px;
-  color: white;
-  border-radius: 0 50%;
-  :after {
-    content: '';
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    background-color: gold;
-    border-radius: 0 50%;
-    left: 7px;
-    transform: rotate(90deg);
-  }
-`;
+import Header from '../components/Header';
 
 export default function Home() {
-  const router = useRouter();
-  const breakpoint = useBreakpoint();
-  const isMobile = breakpoint.xs || (breakpoint.sm && !breakpoint.md);
-
-  const handleClick = () => {
-    router.push('/');
-  };
-
   return (
     <>
       <Head>
@@ -42,25 +11,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Layout>
-        <Layout.Header
-          style={{
-            color: 'white',
-            fontSize: isMobile ? '16px' : '24px',
-            paddingLeft: '24px',
-            display: 'flex',
-            alignItems: 'center'
-          }}
-        >
-          <Button onClick={handleClick} icon={<Icon />} type="link" />
-          {isMobile ? null : (
-            <Typography.Title
-              level={4}
-              style={{ color: 'white', margin: '0px 16px', padding: '0px' }}
-            >
-              Expenses Tracker
-            </Typography.Title>
-          )}
-        </Layout.Header>
+        <Header />
         <Layout.Content>Content</Layout.Content>
       </Layout>
     </>
