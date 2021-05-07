@@ -47,5 +47,10 @@ export const formRules = {
     required: true,
     min: MINIMUM_PASSWORD_LENGTH,
     message: `Password must be at least ${MINIMUM_PASSWORD_LENGTH} characters`
+  },
+  MONEY_FORMAT: {
+    required: true,
+    pattern: /^0$|^[1-9]+$|^[1-9]+(\.)\d{1,2}$/,
+    message: 'Please key in valid number'
   }
 };
