@@ -1,19 +1,23 @@
-import { Button, Col, Form, Input, message, Row, Typography } from 'antd';
+import { Col, Form, Input, message, Row, Typography } from 'antd';
 import Head from 'next/head';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import { formRules } from '@/utils/formRules';
-import { SIGNUP_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
 import { hashPassword } from '@/utils/auth';
+import { apiCall } from '@/utils/apiCall';
+import { SIGNUP_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
+import { COOKIE_NAME } from '@/constants/auth';
+import { destroyCookie } from 'nookies';
 
-const httpHeaders = {
-  'Content-Type': 'application/json'
-};
-const HTTP_POST_METHOD = 'POST';
 const SUCCESSFUL_SIGNUP_MESSAGE = 'Signup completed';
 const SIGNUP_ERROR_MESSAGE = 'Unexpected error. Please try again';
+
+export const getServerSideProps = context => {
+  destroyCookie(context, COOKIE_NAME, '/');
+  return { props: {} };
+};
 
 const SignupPage = () => {
   const router = useRouter();
@@ -22,32 +26,32 @@ const SignupPage = () => {
 
   const handleSignup = useCallback(
     async formValue => {
+      setSubmitting(true);
       const { userName, email, password } = formValue;
-      try {
-        setSubmitting(true);
+      const hashedPassword = hashPassword(password);
+      const payload = {
+        userName,
+        email,
+        password: hashedPassword,
+        confirmedPassword: hashedPassword
+      };
 
-        const hashedPassword = hashPassword(password);
-        const response = await fetch(SIGNUP_ROUTE, {
-          method: HTTP_POST_METHOD,
-          headers: httpHeaders,
-          body: JSON.stringify({
-            userName,
-            email,
-            password: hashedPassword,
-            confirmedPassword: hashedPassword
-          })
-        });
+      const response = await apiCall(
+        SIGNUP_ROUTE,
+        payload,
+        () => setSubmitting(false),
+        () => message.error(SIGNUP_ERROR_MESSAGE)
+      );
 
-        if (response.ok) {
-          message.success(SUCCESSFUL_SIGNUP_MESSAGE);
-          router.push({
-            pathname: EXPENSES_ROUTE
-          });
-        }
-      } catch (error) {
-        message.error(SIGNUP_ERROR_MESSAGE);
-      } finally {
+      if (response.success) {
+        message.success(SUCCESSFUL_SIGNUP_MESSAGE);
         setSubmitting(false);
+        router.push({
+          pathname: EXPENSES_ROUTE
+        });
+      } else {
+        setSubmitting(false);
+        message.error(response.reason);
       }
     },
     [router]

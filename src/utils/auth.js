@@ -1,14 +1,17 @@
 import { setCookie } from 'nookies';
 import sha from 'sha.js';
-import { HASH_ALGO, HASH_DIGEST } from '@/constants/auth';
+import {
+  COOKIE_NAME,
+  COOKIE_AGE,
+  HASH_ALGO,
+  HASH_DIGEST
+} from '@/constants/auth';
 
-const COOKIE_NAME = 'access_token';
-const THIRTY_DAY = 30 * 24 * 60 * 60;
 const ALLOWED_PATH = '/';
 
-export const setLoginCookie = (ctx, token) => {
+export const setLoginCookie = (token, ctx) => {
   setCookie(ctx, COOKIE_NAME, token, {
-    maxAge: THIRTY_DAY,
+    maxAge: COOKIE_AGE,
     path: ALLOWED_PATH
   });
 };
