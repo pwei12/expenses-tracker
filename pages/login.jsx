@@ -10,6 +10,7 @@ import { LOGIN_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
 import { COOKIE_NAME } from '@/constants/auth';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
+import MainLayout from '../components/MainLayout';
 
 const SUCCESSFUL_LOGIN_MESSAGE = 'Login successfully';
 const LOGIN_ERROR_MESSAGE = 'Failed to login. Please try again';
@@ -59,50 +60,52 @@ const LoginPage = () => {
       <Head>
         <title>Login</title>
       </Head>
-      <Row
-        justify="center"
-        align="middle"
-        style={{ padding: 24, height: '100vh' }}
-        gutter={[16, 16]}
-      >
-        <Col xs={24} sm={16} md={12} lg={8} xl={7}>
-          <CenterWrapper>
-            <Typography.Title level={3}>Login</Typography.Title>
-          </CenterWrapper>
-          <Form
-            form={form}
-            onFinish={handleLogin}
-            style={{ marginTop: 20 }}
-            layout="vertical"
-          >
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[formRules.EMAIL_REQUIRED, formRules.EMAIL_FORMAT]}
-            >
-              <Input autoComplete="email" />
-            </Form.Item>
-            <Form.Item>
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[formRules.LOGIN_PASSWORD_FORMAT]}
-              >
-                <Input.Password autoComplete="current-password" />
-              </Form.Item>
-            </Form.Item>
+      <MainLayout>
+        <Row
+          justify="center"
+          align="middle"
+          style={{ padding: 24, height: '100vh', margin: 'auto' }}
+          gutter={[16, 16]}
+        >
+          <Col xs={24} sm={16} md={12} lg={8} xl={7}>
             <CenterWrapper>
-              <RoundCornerButton
-                loading={submitting}
-                type="primary"
-                htmlType="submit"
-              >
-                Submit
-              </RoundCornerButton>
+              <Typography.Title level={3}>Login</Typography.Title>
             </CenterWrapper>
-          </Form>
-        </Col>
-      </Row>
+            <Form
+              form={form}
+              onFinish={handleLogin}
+              style={{ marginTop: 20 }}
+              layout="vertical"
+            >
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[formRules.EMAIL_REQUIRED, formRules.EMAIL_FORMAT]}
+              >
+                <Input autoComplete="email" />
+              </Form.Item>
+              <Form.Item>
+                <Form.Item
+                  name="password"
+                  label="Password"
+                  rules={[formRules.LOGIN_PASSWORD_FORMAT]}
+                >
+                  <Input.Password autoComplete="current-password" />
+                </Form.Item>
+              </Form.Item>
+              <CenterWrapper>
+                <RoundCornerButton
+                  loading={submitting}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Submit
+                </RoundCornerButton>
+              </CenterWrapper>
+            </Form>
+          </Col>
+        </Row>
+      </MainLayout>
     </>
   );
 };
