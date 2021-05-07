@@ -11,6 +11,7 @@ import { COOKIE_NAME } from '@/constants/auth';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
 import MainLayout from '../components/MainLayout';
+import Link from 'next/link';
 
 const SUCCESSFUL_LOGIN_MESSAGE = 'Login successfully';
 const LOGIN_ERROR_MESSAGE = 'Failed to login. Please try again';
@@ -101,6 +102,17 @@ const LoginPage = () => {
                 </RoundCornerButton>
               </CenterWrapper>
             </Form>
+
+            <div
+              style={{
+                marginTop: '16px',
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
+              <Link href="/signup">Create an account </Link>
+              <span>&nbsp; if don't have one yet</span>
+            </div>
           </Col>
         </Row>
       </MainLayout>
