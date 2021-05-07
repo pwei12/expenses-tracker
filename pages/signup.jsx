@@ -48,7 +48,7 @@ const SignupPage = () => {
       if (response.success) {
         message.success(SUCCESSFUL_SIGNUP_MESSAGE);
         router.push({
-          pathname: EXPENSES_ROUTE
+          pathname: '/'
         });
       } else {
         setSubmitting(false);
