@@ -54,7 +54,9 @@ handler.post(async (req, res) => {
             serialize(COOKIE_NAME, token, {
               path: '/',
               httpOnly: true,
-              maxAge: COOKIE_AGE
+              maxAge: COOKIE_AGE,
+              sameSite: 'strict',
+              secure: true
             })
           );
           res.send({ success: true });

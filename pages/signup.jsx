@@ -46,7 +46,6 @@ const SignupPage = () => {
 
       if (response.success) {
         message.success(SUCCESSFUL_SIGNUP_MESSAGE);
-        setSubmitting(false);
         router.push({
           pathname: EXPENSES_ROUTE
         });
@@ -63,16 +62,15 @@ const SignupPage = () => {
       <Head>
         <title>Sign Up</title>
       </Head>
-      <MainLayout>
+      <MainLayout hasLoggedIn={false} hasAuthButton={false}>
         <Row
           justify="center"
           align="middle"
           style={{
             padding: 24,
-            height: '100vh',
-            margin: 'auto'
+            height: '100%',
+            width: '100%'
           }}
-          gutter={[16, 16]}
         >
           <Col xs={24} sm={16} md={12} lg={8} xl={7}>
             <CenterWrapper>

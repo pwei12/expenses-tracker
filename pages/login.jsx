@@ -43,7 +43,6 @@ const LoginPage = () => {
 
       if (response.success) {
         message.success(SUCCESSFUL_LOGIN_MESSAGE);
-        setSubmitting(false);
         router.push({
           pathname: EXPENSES_ROUTE
         });
@@ -60,12 +59,11 @@ const LoginPage = () => {
       <Head>
         <title>Login</title>
       </Head>
-      <MainLayout>
+      <MainLayout hasLoggedIn={false} hasAuthButton={false}>
         <Row
           justify="center"
           align="middle"
-          style={{ padding: 24, height: '100vh', margin: 'auto' }}
-          gutter={[16, 16]}
+          style={{ padding: 24, height: '100%', width: '100%' }}
         >
           <Col xs={24} sm={16} md={12} lg={8} xl={7}>
             <CenterWrapper>
