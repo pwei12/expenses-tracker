@@ -16,6 +16,18 @@ module.exports = {
       version: 'detect'
     }
   },
-  extends: ['plugin:react/recommended', 'airbnb', 'prettier', 'prettier/react'],
-  plugins: ['react', 'prettier']
+  rules: {
+    'no-use-before-define': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    'prettier/prettier': ['error']
+  },
+  extends: [
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'airbnb',
+    'prettier',
+    'prettier/react'
+  ],
+  plugins: ['react', 'prettier', 'react-hooks']
 };
