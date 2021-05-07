@@ -14,10 +14,6 @@ export const dbConnect = async () => {
   return dbConnection;
 };
 
-export const jsonSerialize = object => {
-  return JSON.parse(JSON.stringify(object));
-};
-
 export default async function dbMiddleware(_req, _res, next) {
   try {
     if (!global.mongoose) {
