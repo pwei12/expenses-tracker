@@ -2,6 +2,9 @@ import Head from 'next/head';
 import { parse } from 'cookie';
 import MainLayout from '../components/MainLayout';
 import { COOKIE_NAME } from '@/constants/auth';
+import { Typography } from 'antd';
+import Link from 'next/link';
+import RoundCornerButton from '../components/RoundCornerButton';
 
 export const getServerSideProps = context => {
   const cookies = parse(context.req.headers?.cookie ?? '');
@@ -14,6 +17,9 @@ export const getServerSideProps = context => {
 };
 
 export default function Home({ hasLoggedIn }) {
+  const redirectUrl = hasLoggedIn ? 'expenses' : '/login';
+  const buttonLabel = hasLoggedIn ? 'Expenses' : 'Get Started';
+
   return (
     <>
       <Head>
@@ -22,7 +28,29 @@ export default function Home({ hasLoggedIn }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={true}>
-        CONTENT
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Typography.Title level={3} style={{ textAlign: 'center' }}>
+            Track your expenses everyday
+          </Typography.Title>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '24px'
+          }}
+        >
+          <Link href={redirectUrl}>
+            <a>
+              <RoundCornerButton
+                type="primary"
+                style={{ backgroundColor: '#064274', height: '40px' }}
+              >
+                {buttonLabel}
+              </RoundCornerButton>
+            </a>
+          </Link>
+        </div>
       </MainLayout>
     </>
   );

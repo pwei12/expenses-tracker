@@ -97,6 +97,7 @@ const LoginPage = () => {
                   loading={submitting}
                   type="primary"
                   htmlType="submit"
+                  style={{ backgroundColor: '#064274', height: '40px' }}
                 >
                   Submit
                 </RoundCornerButton>
