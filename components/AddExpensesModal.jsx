@@ -5,24 +5,20 @@ import { formRules } from '@/utils/formRules';
 import { EXPENSE_CATEGORIES } from '@/constants/expense';
 
 const AddExpensesModal = props => {
-  const {
-    form,
-    isVisible,
-    onAddExpenses,
-    onSelectCategory,
-    onSelectDate,
-    onCancel,
-    loading
-  } = props;
-
+  const { form, isVisible, onAddExpenses, onCancel, loading } = props;
   const today = moment.tz(moment.utc(), moment.tz.guess());
+  const initialValues = {
+    category: EXPENSE_CATEGORIES[0],
+    date: today
+  };
+
   return (
     <Modal visible={isVisible} onCancel={onCancel} footer={null}>
       <Form
         form={form}
         onFinish={onAddExpenses}
-        initialValues={{ category: EXPENSE_CATEGORIES[0], date: today }}
         layout="vertical"
+        initialValues={initialValues}
       >
         <Form.Item
           name="amount"
@@ -32,9 +28,7 @@ const AddExpensesModal = props => {
           <Input />
         </Form.Item>
         <Form.Item name="category" label="Category">
-          <Select
-            onChange={categorySelected => onSelectCategory(categorySelected)}
-          >
+          <Select>
             {EXPENSE_CATEGORIES.map(category => (
               <Select.Option key={category} value={category}>
                 {category}
@@ -43,7 +37,7 @@ const AddExpensesModal = props => {
           </Select>
         </Form.Item>
         <Form.Item name="date" label="Date">
-          <DatePicker onChange={onSelectDate} />
+          <DatePicker />
         </Form.Item>
         <Form.Item name="notes" label="Notes">
           <Input.TextArea showCount maxLength={30} />

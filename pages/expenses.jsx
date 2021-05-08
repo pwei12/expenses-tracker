@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { parse } from 'cookie';
-import { Button, Form, List, message, Typography } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Form,
+  List,
+  message,
+  Typography,
+  Row,
+  Col,
+  Tooltip
+} from 'antd';
+import { PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { getRequest, postRequest } from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
@@ -39,7 +48,8 @@ const StyledButton = styled(Button)`
 const SUCCESSFUL_ADD_EXPENSES_MESSAGE = 'Added expenses';
 
 export const getServerSideProps = async context => {
-  const cookies = parse(context.req.headers?.cookie ?? '');
+  const headersCookie = context.req.headers?.cookie ?? '';
+  const cookies = parse(headersCookie);
   const hasLoggedIn = Boolean(cookies[COOKIE_NAME]);
 
   if (!hasLoggedIn) {
@@ -52,7 +62,8 @@ export const getServerSideProps = async context => {
   }
 
   const response = await getRequest(
-    `${process.env.domain}${EXPENSES_API_ROUTE}`
+    `${process.env.domain}${EXPENSES_API_ROUTE}`,
+    headersCookie
   );
 
   if (!response) {
@@ -64,12 +75,22 @@ export const getServerSideProps = async context => {
   return {
     props: {
       hasLoggedIn,
-      ssrExpenses: response.success ? response.data : {}
+      ssrExpenses: response.success ? response.data : {},
+      headersCookie
     }
   };
 };
 
-const ExpensesPage = ({ hasLoggedIn, ssrExpenses, error }) => {
+const ExpenseListFooter = ({ totalExpenses }) => {
+  return (
+    <Row justify="end" gutter={24}>
+      <Col>Total</Col>
+      <Col>{totalExpenses}</Col>
+    </Row>
+  );
+};
+
+const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [form] = Form.useForm();
   const [expenses, setExpenses] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -79,17 +100,19 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, error }) => {
     setExpenses(ssrExpenses);
   }, [ssrExpenses]);
 
-  useEffect(() => {
-    if (!error) return;
-    message.error(error);
-  }, [error]);
-
-  const handleOpenModal = () => {
+  const handleOpenExpenseModal = () => {
     setIsModalVisible(true);
+  };
+
+  const handleOpenEditExpenseModal = expense => {
+    const date = moment(expense.date);
+    form.setFieldsValue({ ...expense, date });
+    handleOpenExpenseModal();
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    form.resetFields();
   };
 
   const handleAddExpenses = async formValue => {
@@ -102,7 +125,11 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, error }) => {
       notes: formValue.notes
     };
     try {
-      const response = await postRequest(EXPENSES_API_ROUTE, payload);
+      const response = await postRequest(
+        EXPENSES_API_ROUTE,
+        payload,
+        headersCookie
+      );
       if (response.success) {
         message.success(SUCCESSFUL_ADD_EXPENSES_MESSAGE);
       } else {
@@ -116,52 +143,55 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, error }) => {
     }
   };
 
-  const handleSelectCategory = category => {
-    console.log('select category', category);
-  };
-
-  const handleSelectDate = date => {
-    console.log('select date', date);
-  };
-
   const formatDate = date => {
     return moment
       .tz(moment(date).utc(), moment.tz.guess())
       .format('D MMM yyyy');
   };
 
+  const sumUpExpenses = expenses => {
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
+  };
+
   return (
     <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={hasLoggedIn}>
-      <StyledButton
-        icon={<PlusCircleOutlined style={{ fontSize: '24px' }} />}
-        onClick={handleOpenModal}
-      ></StyledButton>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography.Title level={3}>Expenses</Typography.Title>
+        <StyledButton
+          icon={<PlusCircleOutlined style={{ fontSize: '24px' }} />}
+          onClick={handleOpenExpenseModal}
+        ></StyledButton>
+      </div>
 
       <AddExpensesModal
         form={form}
         isVisible={isModalVisible}
         onAddExpenses={handleAddExpenses}
-        onSelectCategory={handleSelectCategory}
-        onSelectDate={handleSelectDate}
         onCancel={handleCancel}
         loading={submitting}
       />
 
       <List
-        header={<div>Expenses</div>}
-        footer={<div>Total</div>}
+        footer={<ExpenseListFooter totalExpenses={sumUpExpenses(expenses)} />}
         bordered
         dataSource={expenses}
         renderItem={item => (
-          <List.Item>
+          <List.Item actions={[]}>
             <List.Item.Meta
+              avatar={
+                <Tooltip title="Edit">
+                  <EditOutlined
+                    onClick={() => handleOpenEditExpenseModal(item)}
+                  />
+                </Tooltip>
+              }
               title={formatDate(item.date)}
-              description={item.category}
+              description={`[${item.category}] ${item.notes}`}
             />
             {item.amount}
           </List.Item>
         )}
-        style={{ backgroundColor: 'white', marginTop: '24px' }}
+        style={{ backgroundColor: 'white', marginTop: '16px' }}
       />
     </MainLayout>
   );
