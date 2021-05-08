@@ -4,7 +4,7 @@ import RoundCornerButton from './RoundCornerButton';
 import { formRules } from '@/utils/formRules';
 import { EXPENSE_CATEGORIES } from '@/constants/expense';
 
-const AddExpensesModal = props => {
+const ExpensesModal = props => {
   const { form, isVisible, onOk, onCancel, loading } = props;
   const today = moment.tz(moment.utc(), moment.tz.guess());
   const initialValues = {
@@ -50,4 +50,4 @@ const AddExpensesModal = props => {
   );
 };
 
-export default AddExpensesModal;
+export default ExpensesModal;

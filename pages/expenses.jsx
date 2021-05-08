@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { parse } from 'cookie';
-import { Button, Form, message, Typography } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button, Form, message } from 'antd';
+import { ArrowLeftOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import {
   getRequest,
@@ -40,12 +41,9 @@ const SUCCESSFUL_ADD_EXPENSES_MESSAGE = 'Added expenses';
 const SUCCESSFUL_EDIT_EXPENSES_MESSAGE = 'Updated expenses';
 const SUCCESSFUL_DELETE_EXPENSES_MESSAGE = 'Deleted expenses';
 
-const AddExpensesModal = dynamic(
-  () => import('../components/AddExpensesModal'),
-  {
-    ssr: false
-  }
-);
+const ExpensesModal = dynamic(() => import('../components/ExpensesModal'), {
+  ssr: false
+});
 
 export const getServerSideProps = async context => {
   const headersCookie = context.req.headers?.cookie ?? '';
@@ -66,7 +64,7 @@ export const getServerSideProps = async context => {
     headersCookie
   );
 
-  if (!response) {
+  if (!response.success) {
     return {
       notFound: true
     };
@@ -82,6 +80,7 @@ export const getServerSideProps = async context => {
 };
 
 const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
+  const router = useRouter();
   const [form] = Form.useForm();
   const [expenses, setExpenses] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -201,17 +200,28 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     }
   };
 
+  const redirectToHome = () => {
+    router.push(HOME_ROUTE);
+  };
+
   return (
     <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={hasLoggedIn}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography.Title level={3}>Expenses</Typography.Title>
+        <StyledButton
+          icon={
+            <ArrowLeftOutlined
+              style={{ fontSize: '20px' }}
+              onClick={redirectToHome}
+            />
+          }
+        />
         <StyledButton
           icon={<PlusCircleOutlined style={{ fontSize: '24px' }} />}
           onClick={handleOpenExpenseModal}
-        ></StyledButton>
+        />
       </div>
 
-      <AddExpensesModal
+      <ExpensesModal
         form={form}
         isVisible={isModalVisible}
         onOk={!!editingItemId ? handleEditExpenseItem : handleAddExpenseItem}
