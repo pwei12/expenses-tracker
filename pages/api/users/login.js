@@ -2,7 +2,7 @@ import User from '@/models/user';
 import createHanlder from '@/middleware';
 import jwt from 'jsonwebtoken';
 import { COOKIE_NAME, COOKIE_AGE } from '@/constants/auth';
-// import { serialize } from 'cookie';
+import { serialize } from 'cookie';
 
 const handler = createHanlder();
 
