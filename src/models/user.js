@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import mongooseBcrypt from 'mongoose-bcrypt';
+import { EXPENSE_MODEL_NAME, USER_MODEL_NAME } from '@/constants/model';
 
-const MODEL_NAME = 'User';
-
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     userName: {
       type: String,
@@ -20,12 +19,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true
-    }
+    },
+    expenses: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: EXPENSE_MODEL_NAME
+      }
+    ]
   },
   { timestamps: true }
 );
 
 userSchema.plugin(mongooseBcrypt);
 
-export default mongoose.models[MODEL_NAME] ||
-  mongoose.model(MODEL_NAME, userSchema);
+export default mongoose.models[USER_MODEL_NAME] ||
+  mongoose.model(USER_MODEL_NAME, userSchema);

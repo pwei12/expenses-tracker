@@ -1,9 +1,8 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { EXPENSE_CATEGORIES } from '@/constants/expense';
+import { EXPENSE_MODEL_NAME, USER_MODEL_NAME } from '@/constants/model';
 
-const MODEL_NAME = 'Expense';
-
-const expenseSchema = new mongoose.Schema(
+const expenseSchema = new Schema(
   {
     amount: {
       type: Number,
@@ -25,10 +24,11 @@ const expenseSchema = new mongoose.Schema(
     notes: {
       type: String,
       trim: true
-    }
+    },
+    user: { type: Schema.Types.ObjectId, ref: USER_MODEL_NAME }
   },
   { timestamps: true }
 );
 
-export default mongoose.models[MODEL_NAME] ||
-  mongoose.model(MODEL_NAME, expenseSchema);
+export default mongoose.models[EXPENSE_MODEL_NAME] ||
+  mongoose.model(EXPENSE_MODEL_NAME, expenseSchema);
