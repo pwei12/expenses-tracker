@@ -1,7 +1,8 @@
 import {
   HTTP_HEADERS,
   HTTP_POST_METHOD,
-  HTTP_PUT_METHOD
+  HTTP_PUT_METHOD,
+  HTTP_DELETE_METHOD
 } from '@/constants/http';
 
 const handler = async (route, cookie, payload, httpMethod) => {
@@ -11,7 +12,6 @@ const handler = async (route, cookie, payload, httpMethod) => {
       headers: { ...HTTP_HEADERS, Cookie: cookie },
       ...(payload ? { body: JSON.stringify(payload) } : {})
     };
-
     const response = await fetch(route, fetchOptions);
     const jsonResponse = await response.json();
     return jsonResponse;
@@ -30,4 +30,8 @@ export const putRequest = async (route, payload, cookie) => {
 
 export const getRequest = async (route, cookie) => {
   return await handler(route, cookie);
+};
+
+export const deleteRequest = async (route, payload, cookie) => {
+  return await handler(route, cookie, payload, HTTP_DELETE_METHOD);
 };

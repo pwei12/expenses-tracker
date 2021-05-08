@@ -9,11 +9,22 @@ import {
   Typography,
   Row,
   Col,
-  Tooltip
+  Tooltip,
+  Space,
+  Popconfirm
 } from 'antd';
-import { PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  PlusCircleOutlined,
+  EditOutlined,
+  DeleteOutlined
+} from '@ant-design/icons';
 import styled from 'styled-components';
-import { getRequest, postRequest, putRequest } from '@/utils/apiCall';
+import {
+  getRequest,
+  postRequest,
+  putRequest,
+  deleteRequest
+} from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
 import { COOKIE_NAME } from '@/constants/auth';
 import { EXPENSES_API_ROUTE } from '@/constants/route';
@@ -46,6 +57,8 @@ const StyledButton = styled(Button)`
 `;
 
 const SUCCESSFUL_ADD_EXPENSES_MESSAGE = 'Added expenses';
+const SUCCESSFUL_EDIT_EXPENSES_MESSAGE = 'Updated expenses';
+const SUCCESSFUL_DELETE_EXPENSES_MESSAGE = 'Deleted expenses';
 
 export const getServerSideProps = async context => {
   const headersCookie = context.req.headers?.cookie ?? '';
@@ -94,8 +107,8 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [form] = Form.useForm();
   const [expenses, setExpenses] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [isEditingExpenseItem, setIsEditingExpenseItem] = useState(false);
 
   useEffect(() => {
     setExpenses(ssrExpenses);
@@ -106,9 +119,8 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   };
 
   const handleOpenEditExpenseModal = expense => {
-    setIsEditing(true);
-    const date = moment(expense.date);
-    form.setFieldsValue({ ...expense, date });
+    setIsEditingExpenseItem(true);
+    form.setFieldsValue({ ...expense, date: moment(expense.date) });
     handleOpenExpenseModal();
   };
 
@@ -117,8 +129,8 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     form.resetFields();
   };
 
-  const handleAddExpenses = async formValue => {
-    setSubmitting(true);
+  const handleAddExpenseItem = async formValue => {
+    setIsSubmittingForm(true);
     setIsModalVisible(false);
     const payload = {
       amount: parseFloat(formValue.amount),
@@ -140,13 +152,13 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     } catch (error) {
       message.error(error);
     } finally {
-      setSubmitting(false);
+      setIsSubmittingForm(false);
       form.resetFields();
     }
   };
 
-  const handleEditExpenses = async formValue => {
-    setSubmitting(true);
+  const handleEditExpenseItem = async formValue => {
+    setIsSubmittingForm(true);
     setIsModalVisible(false);
     const payload = {
       amount: parseFloat(formValue.amount),
@@ -161,15 +173,35 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         headersCookie
       );
       if (response.success) {
-        message.success(SUCCESSFUL_ADD_EXPENSES_MESSAGE);
+        message.success(SUCCESSFUL_EDIT_EXPENSES_MESSAGE);
       } else {
         throw response.reason;
       }
     } catch (error) {
       message.error(error);
     } finally {
-      setSubmitting(false);
+      setIsSubmittingForm(false);
+      setIsEditingExpenseItem(false);
       form.resetFields();
+    }
+  };
+
+  const handleDeleteExpenseItem = async expenseItemId => {
+    try {
+      const response = await deleteRequest(
+        EXPENSES_API_ROUTE,
+        {
+          id: expenseItemId
+        },
+        headersCookie
+      );
+      if (response.success) {
+        message.success(SUCCESSFUL_DELETE_EXPENSES_MESSAGE);
+      } else {
+        throw response.reason;
+      }
+    } catch (error) {
+      message.error(error);
     }
   };
 
@@ -196,9 +228,11 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       <AddExpensesModal
         form={form}
         isVisible={isModalVisible}
-        onOk={isEditing ? handleEditExpenses : handleAddExpenses}
+        onOk={
+          isEditingExpenseItem ? handleEditExpenseItem : handleAddExpenseItem
+        }
         onCancel={handleCancel}
-        loading={submitting}
+        loading={isSubmittingForm}
       />
 
       <List
@@ -209,11 +243,23 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
           <List.Item actions={[]}>
             <List.Item.Meta
               avatar={
-                <Tooltip title="Edit">
-                  <EditOutlined
-                    onClick={() => handleOpenEditExpenseModal(item)}
-                  />
-                </Tooltip>
+                <Space>
+                  <Tooltip title="Edit">
+                    <EditOutlined
+                      onClick={() => handleOpenEditExpenseModal(item)}
+                    />
+                  </Tooltip>
+                  <Popconfirm
+                    title="Confirm delete item?"
+                    onConfirm={() => handleDeleteExpenseItem(item._id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Tooltip title="Remove">
+                      <DeleteOutlined />
+                    </Tooltip>
+                  </Popconfirm>
+                </Space>
               }
               title={formatDate(item.date)}
               description={`[${item.category}] ${item.notes}`}
