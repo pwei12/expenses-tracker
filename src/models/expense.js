@@ -23,6 +23,7 @@ const expenseSchema = new Schema(
     },
     notes: {
       type: String,
+      default: '',
       trim: true
     },
     user: { type: Schema.Types.ObjectId, ref: USER_MODEL_NAME }

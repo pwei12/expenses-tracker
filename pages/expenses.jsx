@@ -108,7 +108,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [expenses, setExpenses] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const [isEditingExpenseItem, setIsEditingExpenseItem] = useState(false);
+  const [editingItemId, setEditingItemId] = useState('');
 
   useEffect(() => {
     setExpenses(ssrExpenses);
@@ -119,7 +119,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   };
 
   const handleOpenEditExpenseModal = expense => {
-    setIsEditingExpenseItem(true);
+    setEditingItemId(expense._id);
     form.setFieldsValue({ ...expense, date: moment(expense.date) });
     handleOpenExpenseModal();
   };
@@ -136,7 +136,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       amount: parseFloat(formValue.amount),
       category: formValue.category,
       date: moment.tz(formValue.date.utc(), moment.tz.guess()),
-      notes: formValue.notes
+      notes: formValue.notes ?? ''
     };
     try {
       const response = await postRequest(
@@ -145,6 +145,10 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         headersCookie
       );
       if (response.success) {
+        setExpenses(currentExpenses => [
+          ...currentExpenses,
+          { ...payload, ...response.data }
+        ]);
         message.success(SUCCESSFUL_ADD_EXPENSES_MESSAGE);
       } else {
         throw response.reason;
@@ -161,10 +165,11 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     setIsSubmittingForm(true);
     setIsModalVisible(false);
     const payload = {
+      id: editingItemId,
       amount: parseFloat(formValue.amount),
       category: formValue.category,
       date: moment.tz(formValue.date.utc(), moment.tz.guess()),
-      notes: formValue.notes
+      notes: formValue.notes ?? ''
     };
     try {
       const response = await putRequest(
@@ -173,6 +178,14 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         headersCookie
       );
       if (response.success) {
+        setExpenses(currentExpenses => {
+          return [...currentExpenses].map(expenseItem => {
+            const isItemBeingEdited = expenseItem._id === editingItemId;
+            return isItemBeingEdited
+              ? { ...payload, _id: response.data._id }
+              : expenseItem;
+          });
+        });
         message.success(SUCCESSFUL_EDIT_EXPENSES_MESSAGE);
       } else {
         throw response.reason;
@@ -181,7 +194,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       message.error(error);
     } finally {
       setIsSubmittingForm(false);
-      setIsEditingExpenseItem(false);
+      setEditingItemId('');
       form.resetFields();
     }
   };
@@ -196,6 +209,11 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         headersCookie
       );
       if (response.success) {
+        setExpenses(currentExpenses =>
+          [...currentExpenses].filter(
+            expenseItem => expenseItem._id !== expenseItemId
+          )
+        );
         message.success(SUCCESSFUL_DELETE_EXPENSES_MESSAGE);
       } else {
         throw response.reason;
@@ -228,9 +246,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       <AddExpensesModal
         form={form}
         isVisible={isModalVisible}
-        onOk={
-          isEditingExpenseItem ? handleEditExpenseItem : handleAddExpenseItem
-        }
+        onOk={!!editingItemId ? handleEditExpenseItem : handleAddExpenseItem}
         onCancel={handleCancel}
         loading={isSubmittingForm}
       />

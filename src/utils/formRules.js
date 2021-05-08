@@ -50,7 +50,7 @@ export const formRules = {
   },
   MONEY_FORMAT: {
     required: true,
-    pattern: /^0$|^[1-9]+$|^[1-9]+(\.)\d{1,2}$/,
+    pattern: /^0$|^([1-9])+(\d)*$|^(\d)+(\.)\d{1,2}$/,
     message: 'Please key in valid number'
   }
 };

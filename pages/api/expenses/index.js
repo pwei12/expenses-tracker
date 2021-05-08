@@ -41,13 +41,10 @@ handler.post(async (req, res) => {
 
 handler.put(async (req, res) => {
   try {
-    const cookies = parse(req.headers.cookie ?? '');
-    const userId = jwt.verify(cookies.access_token, process.env.JWT_SECRET).id;
-    const expenseUpdated = await Expense.findOneAndUpdate(
-      { user: userId },
-      req.body,
-      { new: true }
-    );
+    const { id, ...payload } = req.body;
+    const expenseUpdated = await Expense.findByIdAndUpdate(id, payload, {
+      new: true
+    });
     if (!expenseUpdated) {
       return res
         .status(403)
