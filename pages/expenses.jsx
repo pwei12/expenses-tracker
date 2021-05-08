@@ -4,7 +4,7 @@ import { parse } from 'cookie';
 import { Button, Form, List, message, Typography } from 'antd';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { getRequest, newPostRequest } from '@/utils/apiCall';
+import { getRequest, postRequest } from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
 import { COOKIE_NAME } from '@/constants/auth';
 import { EXPENSES_API_ROUTE } from '@/constants/route';
@@ -95,21 +95,18 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, error }) => {
   const handleAddExpenses = async formValue => {
     setSubmitting(true);
     setIsModalVisible(false);
-    setSubmitting(false);
-
+    const payload = {
+      amount: parseFloat(formValue.amount),
+      category: formValue.category,
+      date: moment.tz(formValue.date.utc(), moment.tz.guess()),
+      notes: formValue.notes
+    };
     try {
-      const payload = {
-        amount: parseFloat(formValue.amount),
-        category: formValue.category,
-        date: moment.tz(formValue.date.utc(), moment.tz.guess()),
-        notes: formValue.notes
-      };
-      const response = await newPostRequest(EXPENSES_API_ROUTE, payload);
-
+      const response = await postRequest(EXPENSES_API_ROUTE, payload);
       if (response.success) {
         message.success(SUCCESSFUL_ADD_EXPENSES_MESSAGE);
       } else {
-        throw new Error(response.reason);
+        throw response.reason;
       }
     } catch (error) {
       message.error(error);

@@ -2,7 +2,7 @@ import User from '@/models/user';
 import createHanlder from '@/middleware';
 import jwt from 'jsonwebtoken';
 import { COOKIE_NAME, COOKIE_AGE } from '@/constants/auth';
-import { serialize } from 'cookie';
+// import { serialize } from 'cookie';
 
 const handler = createHanlder();
 
@@ -21,8 +21,9 @@ handler.post(async (req, res) => {
     if (!err) {
       try {
         const isPasswordValid = await user.verifyPassword(password);
-        if (!isPasswordValid) throw new Error('Invalid password');
-
+        if (!isPasswordValid) {
+          res.status(500).json({ success: false, reason: 'Invalid password' });
+        }
         const token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
           expiresIn: '7d'
         });
@@ -38,7 +39,9 @@ handler.post(async (req, res) => {
         );
         res.send({ success: true });
       } catch (error) {
-        res.status(500).json({ success: false, reason: error });
+        res
+          .status(500)
+          .json({ success: false, reason: 'Password verification error' });
       }
     } else {
       res.status(500).json({ success: false, reason: 'Unexpected error' });

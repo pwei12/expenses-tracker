@@ -6,7 +6,7 @@ import { destroyCookie } from 'nookies';
 import { formRules } from '@/utils/formRules';
 import { hashPassword } from '@/utils/auth';
 import { postRequest } from '@/utils/apiCall';
-import { SIGNUP_API_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
+import { SIGNUP_API_ROUTE, HOME_ROUTE } from '@/constants/route';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
 import MainLayout from '../components/MainLayout';
@@ -14,7 +14,6 @@ import { COOKIE_NAME } from '@/constants/auth';
 import Link from 'next/link';
 
 const SUCCESSFUL_SIGNUP_MESSAGE = 'Signup completed';
-const SIGNUP_ERROR_MESSAGE = 'Unexpected error. Please try again';
 
 export const getServerSideProps = context => {
   destroyCookie(context, COOKIE_NAME, '/');
@@ -37,22 +36,20 @@ const SignupPage = () => {
         password: hashedPassword,
         confirmedPassword: hashedPassword
       };
-
-      const response = await postRequest(
-        SIGNUP_API_ROUTE,
-        payload,
-        () => setSubmitting(false),
-        () => message.error(SIGNUP_ERROR_MESSAGE)
-      );
-
-      if (response.success) {
-        message.success(SUCCESSFUL_SIGNUP_MESSAGE);
-        router.push({
-          pathname: '/'
-        });
-      } else {
+      try {
+        const response = await postRequest(SIGNUP_API_ROUTE, payload);
+        if (response.success) {
+          message.success(SUCCESSFUL_SIGNUP_MESSAGE);
+          router.push({
+            pathname: HOME_ROUTE
+          });
+        } else {
+          throw response.reason;
+        }
+      } catch (error) {
+        message.error(error);
+      } finally {
         setSubmitting(false);
-        message.error(response.reason);
       }
     },
     [router]

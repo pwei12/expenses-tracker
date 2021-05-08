@@ -6,7 +6,7 @@ import { destroyCookie } from 'nookies';
 import { formRules } from '@/utils/formRules';
 import { hashPassword } from '@/utils/auth';
 import { postRequest } from '@/utils/apiCall';
-import { LOGIN_API_ROUTE, EXPENSES_ROUTE } from '@/constants/route';
+import { LOGIN_API_ROUTE, HOME_ROUTE } from '@/constants/route';
 import { COOKIE_NAME } from '@/constants/auth';
 import CenterWrapper from '../components/CenterWrapper';
 import RoundCornerButton from '../components/RoundCornerButton';
@@ -14,7 +14,6 @@ import MainLayout from '../components/MainLayout';
 import Link from 'next/link';
 
 const SUCCESSFUL_LOGIN_MESSAGE = 'Login successfully';
-const LOGIN_ERROR_MESSAGE = 'Failed to login. Please try again';
 
 export const getServerSideProps = context => {
   destroyCookie(context, COOKIE_NAME, '/');
@@ -34,22 +33,20 @@ const LoginPage = () => {
         email,
         password: hashPassword(password)
       };
-
-      const response = await postRequest(
-        LOGIN_API_ROUTE,
-        payload,
-        () => setSubmitting(false),
-        () => message.error(LOGIN_ERROR_MESSAGE)
-      );
-
-      if (response.success) {
-        message.success(SUCCESSFUL_LOGIN_MESSAGE);
-        router.push({
-          pathname: '/'
-        });
-      } else {
+      try {
+        const response = await postRequest(LOGIN_API_ROUTE, payload);
+        if (response.success) {
+          message.success(SUCCESSFUL_LOGIN_MESSAGE);
+          router.push({
+            pathname: HOME_ROUTE
+          });
+        } else {
+          throw response.reason;
+        }
+      } catch (error) {
+        message.error(error);
+      } finally {
         setSubmitting(false);
-        message.error(response.reason);
       }
     },
     [router]

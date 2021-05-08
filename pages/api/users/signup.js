@@ -40,7 +40,12 @@ handler.post(async (req, res) => {
       if (!err) {
         try {
           const isPasswordValid = await user.verifyPassword(password);
-          if (!isPasswordValid) throw new Error('Invalid password');
+          if (!isPasswordValid) {
+            res
+              .status(500)
+              .json({ success: false, reason: 'Invalid password' });
+          }
+
           const token = await jwt.sign(
             { id: user.id },
             process.env.JWT_SECRET,
@@ -62,7 +67,9 @@ handler.post(async (req, res) => {
           res.send({ success: true });
         } catch (error) {
           await User.deleteOne({ email }).exec();
-          res.status(500).json({ success: false, reason: error });
+          res
+            .status(500)
+            .json({ success: false, reason: 'Password verification error' });
         }
       } else {
         await User.deleteOne({ email }).exec();
