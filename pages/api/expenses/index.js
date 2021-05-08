@@ -15,8 +15,8 @@ handler.get(async (req, res) => {
       return res.status(404).json({ success: true, data: {} });
     }
     res.status(200).json({ success: true, data: expenses });
-  } catch (error) {
-    res.status(500).json({ success: false, reason: error });
+  } catch {
+    res.status(500).json({ success: false, reason: 'Unexpected error' });
   }
 });
 
@@ -34,8 +34,8 @@ handler.post(async (req, res) => {
         .json({ success: false, reason: 'Failed to add expense' });
     }
     res.status(200).json({ success: true, data: expenseCreated });
-  } catch (error) {
-    res.status(500).json({ success: false, reason: error });
+  } catch {
+    res.status(500).json({ success: false, reason: 'Unexpected error' });
   }
 });
 
@@ -45,7 +45,8 @@ handler.put(async (req, res) => {
     const userId = jwt.verify(cookies.access_token, process.env.JWT_SECRET).id;
     const expenseUpdated = await Expense.findOneAndUpdate(
       { user: userId },
-      req.body
+      req.body,
+      { new: true }
     );
     if (!expenseUpdated) {
       return res
@@ -53,8 +54,28 @@ handler.put(async (req, res) => {
         .json({ success: false, reason: 'Failed to update expense' });
     }
     res.status(200).json({ success: true, data: expenseUpdated });
-  } catch (error) {
-    res.status(500).json({ success: false, reason: error });
+  } catch {
+    res.status(500).json({ success: false, reason: 'Unexpected error' });
+  }
+});
+
+handler.delete(async (req, res) => {
+  try {
+    await Expense.findByIdAndDelete(req.body.id, (error, expenseDeleted) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ success: false, reason: 'Unexpected error' });
+      }
+      if (!expenseDeleted) {
+        return res
+          .status(404)
+          .json({ success: false, reason: 'Expenses item does not exist' });
+      }
+      res.status(200).json({ success: true, id: expenseDeleted._id });
+    });
+  } catch {
+    res.status(500).json({ success: false, reason: 'Unexpected error' });
   }
 });
 
