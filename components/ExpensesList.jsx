@@ -22,6 +22,7 @@ const ExpensesList = props => {
 
   return (
     <List
+      header={<Typography.Title level={4}>Expenses</Typography.Title>}
       footer={<ExpenseListFooter totalExpenses={sumUpExpenses(expenses)} />}
       bordered
       dataSource={sortExpensesByDate(expenses)}
@@ -30,7 +31,7 @@ const ExpensesList = props => {
           <List.Item.Meta
             avatar={
               <Space>
-                <Tooltip title="Edit">
+                <Tooltip title="Edit" zIndex={1}>
                   <EditOutlined onClick={() => onOpenEditExpenseModal(item)} />
                 </Tooltip>
                 <Popconfirm
@@ -39,7 +40,7 @@ const ExpensesList = props => {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Tooltip title="Remove">
+                  <Tooltip title="Remove" zIndex={1}>
                     <DeleteOutlined />
                   </Tooltip>
                 </Popconfirm>

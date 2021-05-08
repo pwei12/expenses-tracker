@@ -2,23 +2,58 @@ import Head from 'next/head';
 import { parse } from 'cookie';
 import MainLayout from '../components/MainLayout';
 import { COOKIE_NAME } from '@/constants/auth';
-import { Typography } from 'antd';
+import { Col, Row, Typography } from 'antd';
 import Link from 'next/link';
 import RoundCornerButton from '../components/RoundCornerButton';
+import { Pie } from 'react-chartjs-2';
+import {
+  EXPENSE_CATEGORIES,
+  PIE_CHART_COLORS,
+  PIE_CHART_HOVER_COLORS
+} from '@/constants/expense';
+import { EXPENSES_API_ROUTE } from '@/constants/route';
+import { getRequest } from '@/utils/apiCall';
+import { sumUpExpenses } from '@/utils/expense';
 
-export const getServerSideProps = context => {
-  const cookies = parse(context.req.headers?.cookie ?? '');
+export const getServerSideProps = async context => {
+  const headersCookie = context.req.headers?.cookie ?? '';
+  const cookies = parse(headersCookie);
   const hasLoggedIn = Boolean(cookies[COOKIE_NAME]);
+
+  const response = await getRequest(
+    `${process.env.domain}${EXPENSES_API_ROUTE}`,
+    headersCookie
+  );
+
   return {
     props: {
-      hasLoggedIn
+      hasLoggedIn,
+      expenses: response.success && hasLoggedIn ? response.data : []
     }
   };
 };
 
-export default function Home({ hasLoggedIn }) {
-  const redirectUrl = hasLoggedIn ? 'expenses' : '/login';
-  const buttonLabel = hasLoggedIn ? 'Expenses' : 'Get Started';
+export default function Home({ hasLoggedIn, expenses }) {
+  const redirectUrl = hasLoggedIn ? '/expenses' : '/login';
+  const buttonLabel = !hasLoggedIn
+    ? 'Get Started'
+    : expenses.length > 0
+    ? 'View List'
+    : 'Add Expenses';
+
+  const expensesByCategory = EXPENSE_CATEGORIES.map(category => {
+    return sumUpExpenses(expenses.filter(item => item.category === category));
+  });
+  const pieChartData = {
+    labels: EXPENSE_CATEGORIES,
+    datasets: [
+      {
+        data: expensesByCategory,
+        backgroundColor: PIE_CHART_COLORS,
+        hoverBackgroundColor: PIE_CHART_HOVER_COLORS
+      }
+    ]
+  };
 
   return (
     <>
@@ -33,18 +68,27 @@ export default function Home({ hasLoggedIn }) {
             Track your expenses everyday
           </Typography.Title>
         </div>
+
+        {expenses.length > 0 ? (
+          <Row justify="center">
+            <Col lg={6}>
+              <Pie data={pieChartData} />
+            </Col>
+          </Row>
+        ) : null}
+
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
-            marginTop: '24px'
+            marginTop: '32px'
           }}
         >
           <Link href={redirectUrl}>
             <a>
               <RoundCornerButton
                 type="primary"
-                style={{ backgroundColor: '#064274', height: '40px' }}
+                style={{ backgroundColor: '#001628', height: '40px' }}
               >
                 {buttonLabel}
               </RoundCornerButton>
