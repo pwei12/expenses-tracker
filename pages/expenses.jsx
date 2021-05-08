@@ -1,23 +1,8 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { parse } from 'cookie';
-import {
-  Button,
-  Form,
-  List,
-  message,
-  Typography,
-  Row,
-  Col,
-  Tooltip,
-  Space,
-  Popconfirm
-} from 'antd';
-import {
-  PlusCircleOutlined,
-  EditOutlined,
-  DeleteOutlined
-} from '@ant-design/icons';
+import { Button, Form, message, Typography } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import {
   getRequest,
@@ -26,16 +11,11 @@ import {
   deleteRequest
 } from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
+import ExpensesItemList from '../components/ExpensesList';
 import { COOKIE_NAME } from '@/constants/auth';
-import { EXPENSES_API_ROUTE } from '@/constants/route';
+import { EXPENSES_API_ROUTE, HOME_ROUTE } from '@/constants/route';
 import moment from 'moment-timezone';
-
-const AddExpensesModal = dynamic(
-  () => import('../components/AddExpensesModal'),
-  {
-    ssr: false
-  }
-);
+import { formatDateToBeSaved } from '@/utils/expense';
 
 const StyledButton = styled(Button)`
   border: none;
@@ -60,6 +40,13 @@ const SUCCESSFUL_ADD_EXPENSES_MESSAGE = 'Added expenses';
 const SUCCESSFUL_EDIT_EXPENSES_MESSAGE = 'Updated expenses';
 const SUCCESSFUL_DELETE_EXPENSES_MESSAGE = 'Deleted expenses';
 
+const AddExpensesModal = dynamic(
+  () => import('../components/AddExpensesModal'),
+  {
+    ssr: false
+  }
+);
+
 export const getServerSideProps = async context => {
   const headersCookie = context.req.headers?.cookie ?? '';
   const cookies = parse(headersCookie);
@@ -68,7 +55,7 @@ export const getServerSideProps = async context => {
   if (!hasLoggedIn) {
     return {
       redirect: {
-        destination: '/',
+        destination: HOME_ROUTE,
         permanent: false
       }
     };
@@ -92,15 +79,6 @@ export const getServerSideProps = async context => {
       headersCookie
     }
   };
-};
-
-const ExpenseListFooter = ({ totalExpenses }) => {
-  return (
-    <Row justify="end" gutter={24}>
-      <Col>Total</Col>
-      <Col>{totalExpenses}</Col>
-    </Row>
-  );
 };
 
 const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
@@ -135,7 +113,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     const payload = {
       amount: parseFloat(formValue.amount),
       category: formValue.category,
-      date: moment.tz(formValue.date.utc(), moment.tz.guess()),
+      date: formatDateToBeSaved(formValue.date),
       notes: formValue.notes ?? ''
     };
     try {
@@ -168,7 +146,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       id: editingItemId,
       amount: parseFloat(formValue.amount),
       category: formValue.category,
-      date: moment.tz(formValue.date.utc(), moment.tz.guess()),
+      date: formatDateToBeSaved(formValue.date),
       notes: formValue.notes ?? ''
     };
     try {
@@ -223,16 +201,6 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     }
   };
 
-  const formatDate = date => {
-    return moment
-      .tz(moment(date).utc(), moment.tz.guess())
-      .format('D MMM yyyy');
-  };
-
-  const sumUpExpenses = expenses => {
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
   return (
     <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={hasLoggedIn}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -251,39 +219,10 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         loading={isSubmittingForm}
       />
 
-      <List
-        footer={<ExpenseListFooter totalExpenses={sumUpExpenses(expenses)} />}
-        bordered
-        dataSource={expenses}
-        renderItem={item => (
-          <List.Item actions={[]}>
-            <List.Item.Meta
-              avatar={
-                <Space>
-                  <Tooltip title="Edit">
-                    <EditOutlined
-                      onClick={() => handleOpenEditExpenseModal(item)}
-                    />
-                  </Tooltip>
-                  <Popconfirm
-                    title="Confirm delete item?"
-                    onConfirm={() => handleDeleteExpenseItem(item._id)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Tooltip title="Remove">
-                      <DeleteOutlined />
-                    </Tooltip>
-                  </Popconfirm>
-                </Space>
-              }
-              title={formatDate(item.date)}
-              description={`[${item.category}] ${item.notes}`}
-            />
-            {item.amount}
-          </List.Item>
-        )}
-        style={{ backgroundColor: 'white', marginTop: '16px' }}
+      <ExpensesItemList
+        expenses={expenses}
+        onOpenEditExpenseModal={handleOpenEditExpenseModal}
+        onDeleteExpenseItem={handleDeleteExpenseItem}
       />
     </MainLayout>
   );
