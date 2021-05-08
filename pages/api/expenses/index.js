@@ -39,4 +39,23 @@ handler.post(async (req, res) => {
   }
 });
 
+handler.put(async (req, res) => {
+  try {
+    const cookies = parse(req.headers.cookie ?? '');
+    const userId = jwt.verify(cookies.access_token, process.env.JWT_SECRET).id;
+    const expenseUpdated = await Expense.findOneAndUpdate(
+      { user: userId },
+      req.body
+    );
+    if (!expenseUpdated) {
+      return res
+        .status(403)
+        .json({ success: false, reason: 'Failed to update expense' });
+    }
+    res.status(200).json({ success: true, data: expenseUpdated });
+  } catch (error) {
+    res.status(500).json({ success: false, reason: error });
+  }
+});
+
 export default handler;

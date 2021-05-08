@@ -5,7 +5,7 @@ import { formRules } from '@/utils/formRules';
 import { EXPENSE_CATEGORIES } from '@/constants/expense';
 
 const AddExpensesModal = props => {
-  const { form, isVisible, onAddExpenses, onCancel, loading } = props;
+  const { form, isVisible, onOk, onCancel, loading } = props;
   const today = moment.tz(moment.utc(), moment.tz.guess());
   const initialValues = {
     category: EXPENSE_CATEGORIES[0],
@@ -16,7 +16,7 @@ const AddExpensesModal = props => {
     <Modal visible={isVisible} onCancel={onCancel} footer={null}>
       <Form
         form={form}
-        onFinish={onAddExpenses}
+        onFinish={onOk}
         layout="vertical"
         initialValues={initialValues}
       >

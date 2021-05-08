@@ -26,57 +26,48 @@ handler.post(async (req, res) => {
       .json({ success: false, reason: 'Email has been registered' });
   }
 
-  await User.create(
-    {
-      ...req.body
-    },
-    async (err, user) => {
-      if (!user) {
-        return res
-          .status(403)
-          .json({ success: false, reason: 'Failed to create account' });
-      }
-
-      if (!err) {
-        try {
-          const isPasswordValid = await user.verifyPassword(password);
-          if (!isPasswordValid) {
-            res
-              .status(500)
-              .json({ success: false, reason: 'Invalid password' });
-          }
-
-          const token = await jwt.sign(
-            { id: user.id },
-            process.env.JWT_SECRET,
-            {
-              expiresIn: '7d'
-            }
-          );
-
-          res.status(201).setHeader(
-            'Set-Cookie',
-            serialize(COOKIE_NAME, token, {
-              path: '/',
-              httpOnly: true,
-              maxAge: COOKIE_AGE,
-              sameSite: 'strict',
-              secure: true
-            })
-          );
-          res.send({ success: true });
-        } catch (error) {
-          await User.deleteOne({ email }).exec();
-          res
-            .status(500)
-            .json({ success: false, reason: 'Password verification error' });
-        }
-      } else {
-        await User.deleteOne({ email }).exec();
-        res.status(500).json({ success: false, reason: 'Unexpected error' });
-      }
+  await User.create(req.body, async (err, user) => {
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, reason: 'Failed to create account' });
     }
-  );
+
+    if (!err) {
+      try {
+        const isPasswordValid = await user.verifyPassword(password);
+        if (!isPasswordValid) {
+          return res
+            .status(500)
+            .json({ success: false, reason: 'Invalid password' });
+        }
+
+        const token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+          expiresIn: '7d'
+        });
+
+        res.status(201).setHeader(
+          'Set-Cookie',
+          serialize(COOKIE_NAME, token, {
+            path: '/',
+            httpOnly: true,
+            maxAge: COOKIE_AGE,
+            sameSite: 'strict',
+            secure: true
+          })
+        );
+        res.send({ success: true });
+      } catch (error) {
+        await User.deleteOne({ email }).exec();
+        res
+          .status(500)
+          .json({ success: false, reason: 'Password verification error' });
+      }
+    } else {
+      await User.deleteOne({ email }).exec();
+      res.status(500).json({ success: false, reason: 'Unexpected error' });
+    }
+  });
 });
 
 export default handler;

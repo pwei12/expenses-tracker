@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import { getRequest, postRequest } from '@/utils/apiCall';
+import { getRequest, postRequest, putRequest } from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
 import { COOKIE_NAME } from '@/constants/auth';
 import { EXPENSES_API_ROUTE } from '@/constants/route';
@@ -95,6 +95,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [expenses, setExpenses] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     setExpenses(ssrExpenses);
@@ -105,6 +106,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   };
 
   const handleOpenEditExpenseModal = expense => {
+    setIsEditing(true);
     const date = moment(expense.date);
     form.setFieldsValue({ ...expense, date });
     handleOpenExpenseModal();
@@ -126,6 +128,34 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     };
     try {
       const response = await postRequest(
+        EXPENSES_API_ROUTE,
+        payload,
+        headersCookie
+      );
+      if (response.success) {
+        message.success(SUCCESSFUL_ADD_EXPENSES_MESSAGE);
+      } else {
+        throw response.reason;
+      }
+    } catch (error) {
+      message.error(error);
+    } finally {
+      setSubmitting(false);
+      form.resetFields();
+    }
+  };
+
+  const handleEditExpenses = async formValue => {
+    setSubmitting(true);
+    setIsModalVisible(false);
+    const payload = {
+      amount: parseFloat(formValue.amount),
+      category: formValue.category,
+      date: moment.tz(formValue.date.utc(), moment.tz.guess()),
+      notes: formValue.notes
+    };
+    try {
+      const response = await putRequest(
         EXPENSES_API_ROUTE,
         payload,
         headersCookie
@@ -166,7 +196,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       <AddExpensesModal
         form={form}
         isVisible={isModalVisible}
-        onAddExpenses={handleAddExpenses}
+        onOk={isEditing ? handleEditExpenses : handleAddExpenses}
         onCancel={handleCancel}
         loading={submitting}
       />
