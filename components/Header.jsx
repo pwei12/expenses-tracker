@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Button, Col, Grid, Layout, message, Row, Typography } from 'antd';
 import Link from 'next/link';
 import AppIcon from './AppIcon';
-import { LOGOUT_API_ROUTE } from '@/constants/route';
+import { LOGOUT_API_ROUTE, HOME_ROUTE } from '@/constants/route';
 import { postRequest } from '@/utils/apiCall';
 
 const SUCCESSFUL_LOGOUT_MESSAGE = 'You have been logged out';
@@ -18,21 +18,20 @@ const Header = ({ hasLoggedIn, hasAuthButton }) => {
 
   const handleButtonClick = async () => {
     if (hasLoggedIn) {
-      const response = await postRequest(
-        LOGOUT_API_ROUTE,
-        {},
-        () => setHasLoggedOut(true),
-        () => message.error(LOGOUT_ERROR_MESSAGE)
-      );
-
-      if (response.success) {
-        message.success(SUCCESSFUL_LOGOUT_MESSAGE);
-        router.push({
-          pathname: '/'
-        });
-      } else {
-        setSubmitting(false);
-        message.error(response.reason);
+      try {
+        const response = await postRequest(LOGOUT_API_ROUTE, {});
+        if (response.success) {
+          message.success(SUCCESSFUL_LOGOUT_MESSAGE);
+          router.push({
+            pathname: HOME_ROUTE
+          });
+        } else {
+          throw LOGOUT_ERROR_MESSAGE;
+        }
+      } catch (error) {
+        message.error(error);
+      } finally {
+        setHasLoggedOut(true);
       }
     } else {
       router.push('/login');
