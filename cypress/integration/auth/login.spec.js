@@ -1,8 +1,7 @@
 import { HTTP_POST_METHOD } from '../../../src/constants/http';
 
-const ROOT = 'http://localhost:3000';
-const LOGIN_PAGE = `${ROOT}/login`;
-const LOGIN_ENDPOINT = `${ROOT}/api/users/login`;
+const LOGIN_PAGE = '/login';
+const LOGIN_ENDPOINT = '/api/users/login';
 
 describe('Login page', () => {
   beforeEach(() => {

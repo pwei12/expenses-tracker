@@ -1,8 +1,7 @@
 import { HTTP_POST_METHOD } from '../../../src/constants/http';
 
-const ROOT = 'http://localhost:3000';
-const SIGNUP_PAGE = `${ROOT}/signup`;
-const SIGNUP_ENDPOINT = `${ROOT}/api/users/signup`;
+const SIGNUP_PAGE = '/signup';
+const SIGNUP_ENDPOINT = '/api/users/signup';
 
 describe('Signup page', () => {
   beforeEach(() => {
