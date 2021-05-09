@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { parse } from 'cookie';
-import { Button, Form, message } from 'antd';
+import { Button, Form, message, Spin } from 'antd';
 import { ArrowLeftOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import {
@@ -86,6 +86,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [editingItemId, setEditingItemId] = useState('');
+  const [isUpdatingExpenses, setIsUpdatingExpenses] = useState(false);
 
   useEffect(() => {
     setExpenses(ssrExpenses);
@@ -109,6 +110,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const handleAddExpenseItem = async formValue => {
     setIsSubmittingForm(true);
     setIsModalVisible(false);
+    setIsUpdatingExpenses(true);
     const payload = {
       amount: parseFloat(formValue.amount),
       category: formValue.category,
@@ -135,12 +137,14 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     } finally {
       setIsSubmittingForm(false);
       form.resetFields();
+      setIsUpdatingExpenses(false);
     }
   };
 
   const handleEditExpenseItem = async formValue => {
     setIsSubmittingForm(true);
     setIsModalVisible(false);
+    setIsUpdatingExpenses(true);
     const payload = {
       id: editingItemId,
       amount: parseFloat(formValue.amount),
@@ -173,11 +177,13 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       setIsSubmittingForm(false);
       setEditingItemId('');
       form.resetFields();
+      setIsUpdatingExpenses(false);
     }
   };
 
   const handleDeleteExpenseItem = async expenseItemId => {
     try {
+      setIsUpdatingExpenses(true);
       const response = await deleteRequest(
         EXPENSES_API_ROUTE,
         {
@@ -197,6 +203,8 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
       }
     } catch (error) {
       message.error(error);
+    } finally {
+      setIsUpdatingExpenses(false);
     }
   };
 
@@ -233,6 +241,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         expenses={expenses}
         onOpenEditExpenseModal={handleOpenEditExpenseModal}
         onDeleteExpenseItem={handleDeleteExpenseItem}
+        isLoading={isUpdatingExpenses}
       />
     </MainLayout>
   );

@@ -18,7 +18,12 @@ const ExpenseListFooter = ({ totalExpenses }) => {
 };
 
 const ExpensesList = props => {
-  const { expenses, onOpenEditExpenseModal, onDeleteExpenseItem } = props;
+  const {
+    expenses,
+    onOpenEditExpenseModal,
+    onDeleteExpenseItem,
+    isLoading
+  } = props;
 
   return (
     <List
@@ -26,6 +31,7 @@ const ExpensesList = props => {
       footer={<ExpenseListFooter totalExpenses={sumUpExpenses(expenses)} />}
       bordered
       dataSource={sortExpensesByDate(expenses)}
+      loading={isLoading}
       renderItem={item => (
         <List.Item actions={[]}>
           <List.Item.Meta
