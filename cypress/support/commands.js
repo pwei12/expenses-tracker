@@ -23,3 +23,11 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('getByLabel', label => {
+  cy.contains('label', label)
+    .invoke('attr', 'for')
+    .then(id => {
+      cy.get('#' + id);
+    });
+});
