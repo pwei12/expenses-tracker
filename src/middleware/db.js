@@ -20,7 +20,7 @@ export default async function dbMiddleware(_req, _res, next) {
       global.mongoose === dbConnect();
     }
   } catch (error) {
-    console.errro(error);
+    console.error(error);
   }
   return next();
 }
