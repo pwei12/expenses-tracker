@@ -105,7 +105,10 @@ const SignupPage = () => {
                 hasFeedback
                 name="confirmedPassword"
                 label="Confirm Password"
-                rules={[formRules.PASSWORD_REQUIRED, formRules.PASSWORD_MATCH]}
+                rules={[
+                  formRules.CONFIRM_PASSWORD_REQUIRED,
+                  formRules.PASSWORD_MATCH
+                ]}
               >
                 <Input.Password />
               </Form.Item>

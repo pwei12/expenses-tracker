@@ -2,10 +2,6 @@ const MINIMUM_PASSWORD_LENGTH = 6;
 const MAXIMUM_PASSWORD_LENGTH = 10;
 
 export const formRules = {
-  FIELD_REQUIRED: {
-    required: true,
-    message: 'This field is required'
-  },
   EMAIL_REQUIRED: {
     required: true,
     message: 'Email is required'
@@ -33,7 +29,11 @@ export const formRules = {
   },
   PASSWORD_REQUIRED: {
     required: true,
-    message: 'Please select a valid password.'
+    message: 'Password is required'
+  },
+  CONFIRM_PASSWORD_REQUIRED: {
+    required: true,
+    message: 'Please confirm password'
   },
   PASSWORD_MATCH: ({ getFieldValue }) => ({
     validator(_rule, value) {
