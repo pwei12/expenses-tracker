@@ -9,7 +9,8 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es6: true
+    es6: true,
+    'cypress/globals': true
   },
   settings: {
     react: {
@@ -28,7 +29,8 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'airbnb',
     'prettier',
-    'prettier/react'
+    'prettier/react',
+    'plugin:cypress/recommended'
   ],
-  plugins: ['react', 'prettier', 'react-hooks']
+  plugins: ['react', 'prettier', 'react-hooks', 'cypress']
 };
