@@ -54,7 +54,7 @@ yarn
 ```
 
 ### Add Environment Variables
-Open .env.local and add the following variables
+Create .env.local file and add the following variables
 - MONGO_DB_URI=YourMongoDbURI
 - JWT_SECRET=AnyString
 - DOMAIN=http://localhost:3000
@@ -104,6 +104,7 @@ npm run cypress:open
 # or
 yarn cypress:open
 ```
+*Notes: need to first run development server
 
 ### Run E2E in CLI
 
@@ -112,3 +113,5 @@ npm run cypress:run
 # or
 yarn cypress:run
 ```
+
+*Notes: need to first run development server
