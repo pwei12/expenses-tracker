@@ -53,6 +53,14 @@ npm install
 yarn
 ```
 
+### Add Environment Variables
+Open .env.local and add the following variables
+- MONGO_DB_URI=YourMongoDbURI
+- JWT_SECRET=AnyString
+- DOMAIN=http://localhost:3000
+
+*Notes: replace values MONGO_DB_URI and JWT_SECRET with your own mongoDB connection URI and specific jwt secret
+
 ### Run Development Server
 
 ```bash
