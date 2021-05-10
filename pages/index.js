@@ -14,13 +14,19 @@ import {
 import { EXPENSES_API_ROUTE } from '@/constants/route';
 import { getRequest } from '@/utils/apiCall';
 import { sumUpExpenses } from '@/utils/expense';
+import jwt from 'jsonwebtoken';
 
 export const getServerSideProps = async context => {
   const headersCookie = context.req.headers?.cookie ?? '';
   const cookies = parse(headersCookie);
   const hasLoggedIn = Boolean(cookies[COOKIE_NAME]);
+  let userName = '';
+  if (hasLoggedIn) {
+    userName = jwt.verify(cookies[COOKIE_NAME], process.env.JWT_SECRET)
+      .userName;
+  }
 
-  const response = await getRequest(
+  const getExpensesResponse = await getRequest(
     `${process.env.DOMAIN}${EXPENSES_API_ROUTE}`,
     headersCookie
   );
@@ -28,12 +34,16 @@ export const getServerSideProps = async context => {
   return {
     props: {
       hasLoggedIn,
-      expenses: response.success && hasLoggedIn ? response.data : []
+      expenses:
+        getExpensesResponse.success && hasLoggedIn
+          ? getExpensesResponse.data
+          : [],
+      userName
     }
   };
 };
 
-export default function Home({ hasLoggedIn, expenses }) {
+export default function Home({ hasLoggedIn, expenses, userName }) {
   const redirectUrl = hasLoggedIn ? '/expenses' : '/login';
   const buttonLabel = !hasLoggedIn
     ? 'Get Started'
@@ -65,8 +75,10 @@ export default function Home({ hasLoggedIn, expenses }) {
       <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={true}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Typography.Title level={3} style={{ textAlign: 'center' }}>
-            Track your expenses everyday
-          </Typography.Title>
+            {hasLoggedIn
+              ? `Hi ${userName ?? ''}`
+              : ' Track your expenses everyday'}
+          </Typography.Title>{' '}
         </div>
 
         {expenses.length > 0 ? (
