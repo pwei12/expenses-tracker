@@ -3,7 +3,7 @@ import Header from './Header';
 
 const MainLayout = ({ children, hasLoggedIn, hasAuthButton }) => {
   return (
-    <Layout style={{ height: '100vh' }}>
+    <Layout style={{ minHeight: '100vh' }}>
       <Header hasLoggedIn={hasLoggedIn} hasAuthButton={hasAuthButton} />
       <Layout.Content style={{ padding: '24px' }}>{children}</Layout.Content>
     </Layout>
