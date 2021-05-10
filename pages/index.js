@@ -21,7 +21,7 @@ export const getServerSideProps = async context => {
   const hasLoggedIn = Boolean(cookies[COOKIE_NAME]);
 
   const response = await getRequest(
-    `${process.env.domain}${EXPENSES_API_ROUTE}`,
+    `${process.env.DOMAIN}${EXPENSES_API_ROUTE}`,
     headersCookie
   );
 
