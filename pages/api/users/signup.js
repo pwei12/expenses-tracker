@@ -41,10 +41,13 @@ handler.post(async (req, res) => {
             .status(500)
             .json({ success: false, reason: 'Invalid password' });
         }
-
-        const token = await jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-          expiresIn: '7d'
-        });
+        const token = await jwt.sign(
+          { id: user.id, userName: user.userName },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: '7d'
+          }
+        );
 
         res.status(201).setHeader(
           'Set-Cookie',
