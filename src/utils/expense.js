@@ -10,7 +10,7 @@ export const formatDateToBeSaved = date => {
 
 export const sumUpExpenses = expenses => {
   return expenses.reduce(
-    (total, expense) => Math.floor((total + expense.amount) * 100) / 100,
+    (total, expense) => Math.round(total * 100 + expense.amount * 100) / 100,
     0
   );
 };
