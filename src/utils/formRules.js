@@ -25,7 +25,7 @@ export const formRules = {
     pattern: new RegExp(
       `^(?=\\S*[a-zA-Z])(?=\\S*\\d)(?=\\S*([^\\w\\s]|[_]))\\S{${MINIMUM_PASSWORD_LENGTH},${MAXIMUM_PASSWORD_LENGTH}}$`
     ),
-    message: `Password should consist of at least one letter, one number, one special charactoer and be at least ${MINIMUM_PASSWORD_LENGTH} to ${MAXIMUM_PASSWORD_LENGTH} characters long.`
+    message: `Password should consist of at least one letter, one number, one special character and be at least ${MINIMUM_PASSWORD_LENGTH} to ${MAXIMUM_PASSWORD_LENGTH} characters long.`
   },
   PASSWORD_REQUIRED: {
     required: true,
