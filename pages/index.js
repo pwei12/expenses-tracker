@@ -22,8 +22,9 @@ export const getServerSideProps = async context => {
   const hasLoggedIn = Boolean(cookies[COOKIE_NAME]);
   let userName = '';
   if (hasLoggedIn) {
-    userName = jwt.verify(cookies[COOKIE_NAME], process.env.JWT_SECRET)
-      .userName;
+    userName =
+      jwt.verify(cookies[COOKIE_NAME], process.env.JWT_SECRET)?.userName ??
+      null;
   }
 
   const getExpensesResponse = await getRequest(
