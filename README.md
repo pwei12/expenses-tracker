@@ -13,11 +13,11 @@ This is an expenses-tracker that is deployed on Vercel platform. It can be acces
 - Each expenses item can be modified
 - Each expenses item can also be deleted
 - The sum of all expenses is shown at the bottom of the list
-- Pie chart view on home page to show expenses by category
+- A pie chart on home page to show expenses by category
 
-## Features to Add
+## Features to Add in Future
 
-- Allow user to sort expenses items by date in different orders
+- Allow user to sort expenses items by date in ascending or descending orders
 - Allow expenses items to be filtered by category or date
 - Give options to group expenses items by category or date
 - Add date picker to view expenses within certain range of date
@@ -52,6 +52,14 @@ npm install
 # or
 yarn
 ```
+
+### Add Environment Variables
+Open .env.local and add the following variables
+- MONGO_DB_URI=YourMongoDbURI
+- JWT_SECRET=AnyString
+- DOMAIN=http://localhost:3000
+
+*Notes: replace values MONGO_DB_URI and JWT_SECRET with your own mongoDB connection URI and specific jwt secret
 
 ### Run Development Server
 
