@@ -3,13 +3,13 @@ import ExpensesList from '../../components/ExpensesList';
 
 const expenses = [
   {
-    amount: 10,
+    amount: 10.01,
     date: new Date('2020, 12, 27'),
     category: 'Travel',
     notes: 'first item'
   },
   {
-    amount: 50,
+    amount: 50.08,
     date: new Date(),
     category: 'Food',
     notes: 'Second item'
@@ -42,8 +42,8 @@ describe('<ExpensesList />', () => {
     cy.findByText('27 Dec 2020').should('be.visible');
   });
 
-  it('renders sum of expenses', () => {
-    cy.findByText('60').should('be.visible');
+  it('renders sum of expenses correctly', () => {
+    cy.findByText('60.09').should('be.visible');
   });
 });
 
