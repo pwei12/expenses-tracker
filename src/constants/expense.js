@@ -33,3 +33,5 @@ export const PIE_CHART_HOVER_COLORS = [
   '#ff577f',
   '#ff8303'
 ];
+
+export const SHOW_EXPENSES_BY = ['Month', 'Category'];
