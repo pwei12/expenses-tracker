@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { parse } from 'cookie';
-import { Button, Form, message, Spin } from 'antd';
+import { Button, Col, Form, message, Row, Select, Typography } from 'antd';
 import { ArrowLeftOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import {
@@ -12,11 +12,17 @@ import {
   deleteRequest
 } from '@/utils/apiCall';
 import MainLayout from '../components/MainLayout';
-import ExpensesItemList from '../components/ExpensesList';
+import ExpensesItemList from '../components/ExpensesItemList';
 import { COOKIE_NAME } from '@/constants/auth';
 import { EXPENSES_API_ROUTE, HOME_ROUTE } from '@/constants/route';
 import moment from 'moment-timezone';
-import { formatDateToBeSaved } from '@/utils/expense';
+import {
+  formatDateToBeSaved,
+  sumUpExpenses,
+  formatExpensesForDisplayByCategory,
+  formatExpensesForDisplayByMonth
+} from '@/utils/expense';
+import { SHOW_EXPENSES_BY } from '@/constants/expense';
 
 const StyledButton = styled(Button)`
   border: none;
@@ -87,6 +93,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [editingItemId, setEditingItemId] = useState('');
   const [isUpdatingExpenses, setIsUpdatingExpenses] = useState(false);
+  const [showBy, setShowBy] = useState(SHOW_EXPENSES_BY[0]);
 
   useEffect(() => {
     setExpenses(ssrExpenses);
@@ -102,7 +109,7 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     handleOpenExpenseModal();
   };
 
-  const handleCancel = () => {
+  const handleCloseExpenseModal = () => {
     setIsModalVisible(false);
     form.resetFields();
   };
@@ -212,6 +219,10 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
     router.push(HOME_ROUTE);
   };
 
+  const handleChangeShowBy = showBy => {
+    setShowBy(showBy);
+  };
+
   return (
     <MainLayout hasLoggedIn={hasLoggedIn} hasAuthButton={hasLoggedIn}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -233,16 +244,64 @@ const ExpensesPage = ({ hasLoggedIn, ssrExpenses, headersCookie }) => {
         form={form}
         isVisible={isModalVisible}
         onOk={!!editingItemId ? handleEditExpenseItem : handleAddExpenseItem}
-        onCancel={handleCancel}
+        onCancel={handleCloseExpenseModal}
         loading={isSubmittingForm}
       />
+      <div>
+        <span style={{ marginRight: '12px' }}>Show by:</span>
+        <Select defaultValue={showBy} onChange={handleChangeShowBy}>
+          <Select.Option value={SHOW_EXPENSES_BY[0]}>Month</Select.Option>
+          <Select.Option value={SHOW_EXPENSES_BY[1]}>Category</Select.Option>
+        </Select>
+      </div>
 
-      <ExpensesItemList
-        expenses={expenses}
-        onOpenEditExpenseModal={handleOpenEditExpenseModal}
-        onDeleteExpenseItem={handleDeleteExpenseItem}
-        isLoading={isUpdatingExpenses}
-      />
+      <div
+        style={{
+          backgroundColor: 'white',
+          marginTop: '16px',
+          border: '1px solid #d9d9d9'
+        }}
+      >
+        <Typography.Title
+          level={4}
+          style={{
+            padding: '16px',
+            border: '1px solid #d9d9d9',
+            margin: '0px'
+          }}
+        >
+          Expenses
+        </Typography.Title>
+        {Object.entries(
+          showBy === SHOW_EXPENSES_BY[0]
+            ? formatExpensesForDisplayByMonth(expenses)
+            : formatExpensesForDisplayByCategory(expenses)
+        ).map(([title, expenses]) => (
+          <div key={title}>
+            <div
+              style={{
+                backgroundColor: '#081136',
+                padding: '16px',
+                color: 'white'
+              }}
+            >
+              {title}
+            </div>
+            <ExpensesItemList
+              expenses={expenses}
+              onOpenEditExpenseModal={handleOpenEditExpenseModal}
+              onDeleteExpenseItem={handleDeleteExpenseItem}
+              isLoading={isUpdatingExpenses}
+            />
+          </div>
+        ))}
+        <Row justify="space-between" style={{ padding: '16px' }}>
+          <Col>Total</Col>
+          <Col>
+            <Typography.Text strong>{sumUpExpenses(expenses)}</Typography.Text>
+          </Col>
+        </Row>
+      </div>
     </MainLayout>
   );
 };
