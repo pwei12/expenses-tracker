@@ -1,5 +1,5 @@
 import { mount } from '@cypress/react';
-import ExpensesList from '../../components/ExpensesList';
+import ExpensesList from '../../components/ExpensesItemList';
 
 const expenses = [
   {

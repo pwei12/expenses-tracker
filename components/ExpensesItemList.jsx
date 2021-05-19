@@ -1,21 +1,6 @@
-import { List, Row, Col, Tooltip, Space, Popconfirm, Typography } from 'antd';
+import { List, Tooltip, Space, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import {
-  formatDateForDisplay,
-  sumUpExpenses,
-  sortExpensesByDate
-} from '@/utils/expense';
-
-const ExpenseListFooter = ({ totalExpenses }) => {
-  return (
-    <Row justify="end" gutter={24}>
-      <Col>Total</Col>
-      <Col>
-        <Typography.Text strong>{totalExpenses}</Typography.Text>
-      </Col>
-    </Row>
-  );
-};
+import { formatDateForDisplay } from '@/utils/expense';
 
 const ExpensesList = props => {
   const {
@@ -27,13 +12,11 @@ const ExpensesList = props => {
 
   return (
     <List
-      header={<Typography.Title level={4}>Expenses</Typography.Title>}
-      footer={<ExpenseListFooter totalExpenses={sumUpExpenses(expenses)} />}
       bordered
-      dataSource={sortExpensesByDate(expenses)}
+      dataSource={expenses}
       loading={isLoading}
       renderItem={item => (
-        <List.Item actions={[]}>
+        <List.Item>
           <List.Item.Meta
             avatar={
               <Space>
@@ -58,7 +41,7 @@ const ExpensesList = props => {
           {item.amount}
         </List.Item>
       )}
-      style={{ backgroundColor: 'white', marginTop: '16px' }}
+      style={{ backgroundColor: 'white' }}
     />
   );
 };
